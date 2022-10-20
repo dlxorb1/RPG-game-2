@@ -20,9 +20,9 @@
 void print_status(int, int, int, int, int, int);
 int print_menu();
 int calculate_damage(int, int, int);
-void attack();
-void defense();
+void attack(int*, int, int, int*, int, int);
+void defense(int*, int, int, int*, int, int);
 void init_game(int*, int*, int*, int*, int*, int*);
-void run_game();
+void run_game(int*, int*, int*, int*, int*, int*);
 
 #endif

@@ -1,9 +1,9 @@
 /*
 - Author:
-- Data: 22.10.06
+- Data: 22.10.20
 - Description: Basic RGP game
 - Patch note:
-	1. function
+	1. Pointer.
 */
 #include "game.h"
 
@@ -16,8 +16,10 @@ int main() {
 	int monster_att;
 	int monster_def;
 
-	init_game(&player_hp, &player_att, &player_def, &monster_hp, &monster_att, &monster_def);
-	run_game();
+	init_game(&player_hp, &player_att, &player_def,
+		&monster_hp, &monster_att, &monster_def);
+	run_game(&player_hp, &player_att, &player_def,
+		&monster_hp, &monster_att, &monster_def);
 
 	return 0;
 }

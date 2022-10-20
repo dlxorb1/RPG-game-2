@@ -11,6 +11,7 @@ void init_game(int* player_hp, int* player_att, int* player_def,
 	*monster_att = 10;
 	*monster_def = 8;
 
+/*scanf 오류 : 솔루션탐색기 -> RPG-GAME2 -> 속성 -> C/C++ -> 전처리기 -> ;() 붙여넣기*/
 	srand(time(NULL));
 }
 
@@ -18,13 +19,15 @@ void run_game(int* player_hp, int* player_att, int* player_def,
 	int* monster_hp, int* monster_att, int* monster_def) {
 
 	while (1) {
-		print_status(player_hp, player_att, player_def,
-			monster_hp, monster_att, monster_def);
+		print_status(*player_hp, *player_att, *player_def,
+			*monster_hp, *monster_att, *monster_def);
 
 		int choice = print_menu();
 
-		if (choice == 1) attack();
-		else if (choice == 2) defense();
+		if (choice == 1) attack(player_hp, *player_att, *player_def,
+			monster_hp, *monster_att, *monster_def);
+		else if (choice == 2) defense(player_hp, *player_att, *player_def,
+			monster_hp, *monster_att, *monster_def);
 		else if (choice == 3) {
 			printf("Bye bye!\n");
 			break;
@@ -52,7 +55,7 @@ void print_status(int player_hp, int player_att, int player_def,
 	printf("- ATT: %d\n", player_att);
 	printf("- DEF: %d\n", player_def);
 	printf("=========================\n");
-	printf("Monster status============\n");
+	printf("Monster status===========\n");
 	printf("- HP: %d\n", monster_hp);
 	printf("- ATT: %d\n", monster_att);
 	printf("- DEF: %d\n", monster_def);
@@ -81,32 +84,34 @@ int calculate_damage(int att, int def, int do_critical) {
 	return damage;
 }
 
-void attack() {
+void attack(int* player_hp, int player_att, int player_def,
+	int* monster_hp, int monster_att, int monster_def) {
 	int damage = calculate_damage(player_att, monster_def, TRUE);
 
 	printf("Hit the monster with damage %d.\n", damage);
-	monster_hp -= damage;
+	*monster_hp -= damage;
 
 	int cntatt = rand() % 2;
 	if (monster_hp > 0 && cntatt) {
 		printf("Watch out! Monster's counterattack!\n");
 		damage = calculate_damage(monster_att, player_def, FALSE);
-		player_hp -= damage;
+		*player_hp -= damage;
 		printf("Got damage %d from the mosnter.\n", damage);
 	}
 }
 
-void defense() {
+void defense(int* player_hp, int player_att, int player_def,
+	int* monster_hp, int monster_att, int monster_def) {
 	int damage = calculate_damage(monster_att, player_def, TRUE);
 
 	printf("Got damage %d from the monster.\n", damage);
-	player_hp -= damage;
+	*player_hp -= damage;
 
 	int cntatt = rand() % 2;
 	if (player_hp > 0 && cntatt) {
 		printf("Let's counterattack.\n");
 		damage = calculate_damage(player_att, monster_def, FALSE);
-		monster_hp -= damage;
+		*monster_hp -= damage;
 		printf("Hit the monster with damage %d.\n", damage);
 	}
 }
