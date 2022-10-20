@@ -1,25 +1,30 @@
 #include "game.h"
 
-void init_game(int* player_hp, int* player_att, int* player_def,
+void init_game(int* player_hp, int* player_att, int* player_def, short inventory[], long* cache,
 	int* monster_hp, int* monster_att, int* monster_def) {
+
 	printf("initialize the game.\n");
 	*player_hp = 100;
 	*player_att = 10;
 	*player_def = 8;
+	*cache = 0;
+
+	for (int i = 0; i < INVENTORY_SIZE; ++i)
+		inventory[i] = 0;
 
 	*monster_hp = 80;
 	*monster_att = 10;
 	*monster_def = 8;
 
-/*scanf 오류 : 솔루션탐색기 -> RPG-GAME2 -> 속성 -> C/C++ -> 전처리기 -> ;() 붙여넣기*/
+//*scanf 오류 : 솔루션탐색기 -> RPG-GAME2 -> 속성 -> C/C++ -> 전처리기 -> ;() 붙여넣기
 	srand(time(NULL));
 }
 
-void run_game(int* player_hp, int* player_att, int* player_def,
+void run_game(int* player_hp, int* player_att, int* player_def, short inventory[], long* cache,
 	int* monster_hp, int* monster_att, int* monster_def) {
 
 	while (1) {
-		print_status(*player_hp, *player_att, *player_def,
+		print_status(*player_hp, *player_att, *player_def, inventory,
 			*monster_hp, *monster_att, *monster_def);
 
 		int choice = print_menu();
@@ -29,6 +34,10 @@ void run_game(int* player_hp, int* player_att, int* player_def,
 		else if (choice == 2) defense(player_hp, *player_att, *player_def,
 			monster_hp, *monster_att, *monster_def);
 		else if (choice == 3) {
+
+
+		}
+		else if (choice == 4) {
 			printf("Bye bye!\n");
 			break;
 		}
@@ -37,24 +46,73 @@ void run_game(int* player_hp, int* player_att, int* player_def,
 			continue;
 		}
 
-		if (player_hp <= 0) {
+		if (*player_hp <= 0) {
 			printf("You loose.\n");
 			break;
 		}
-		else if (monster_hp <= 0) {
-			printf("You won.\n");
-			break;
+		else if (*monster_hp <= 0) {
+			short item = get_item();
+			put_item(inventory, item);
+			//*monster_hp = 80;
+			/*printf("You won.\n");
+			break;*/
 		}
 	}
 }
 
-void print_status(int player_hp, int player_att, int player_def,
+void respawn_monster(int* monster_hp) {
+	*monster_hp = 80;
+}
+
+
+int find_empty_slot(short inventory[]) {
+	int idx_empty = -1;
+
+	for (int i = 0; i < INVENTORY_SIZE;++i) {
+		if (inventory[i] == 0) {
+			idx_empty = i;
+			break;
+		}
+	}
+	return idx_empty;
+}
+
+void put_item(short inventory[], short item) {
+	int idx_empty = find_empty_slot(inventory);
+
+	if (idx_empty > -1 && idx_empty < INVENTORY_SIZE)
+		inventory[idx_empty] = item;
+	else
+		printf("Inventory is full!\n");
+}
+
+
+short get_item() {
+	short item = 0;
+	double rate = (double)(rand() % 11) / 10.0;
+
+	if (rate < DROP_RATE)
+		item = rand() % 51 + 50;
+
+	return item;
+}
+
+void print_inventory(short inventory[]) {
+	printf("INVENTORY====================\n");
+	for (int i = 0; i < INVENTORY_SIZE; ++i) {
+		printf("%d. %d\t", i, inventory[i]);
+	}
+	printf("=============================\n");
+}
+
+void print_status(int player_hp, int player_att, int player_def, short inventory[],
 	int monster_hp, int monster_att, int monster_def) {
 	printf("Player status============\n");
 	printf("- HP: %d\n", player_hp);
 	printf("- ATT: %d\n", player_att);
 	printf("- DEF: %d\n", player_def);
 	printf("=========================\n");
+	print_inventory(inventory);
 	printf("Monster status===========\n");
 	printf("- HP: %d\n", monster_hp);
 	printf("- ATT: %d\n", monster_att);
@@ -66,7 +124,8 @@ int print_menu() {
 	printf("Menu=====================\n");
 	printf("1. Attack.\n");
 	printf("2. Defense.\n");
-	printf("3. Run.\n");
+	printf("3. Sell Item.\n");
+	printf("4. Run.\n");
 	printf("=========================\n");
 
 	int choice;
